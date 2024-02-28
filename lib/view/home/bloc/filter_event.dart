@@ -35,3 +35,5 @@ class ItemLikedEvent extends FilterEvent {
   @override
   List<Object?> get props => [index];
 }
+
+class FilterItemEvent extends FilterEvent {}

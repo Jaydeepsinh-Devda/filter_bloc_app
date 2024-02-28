@@ -86,8 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _loadingIndicator() => const SliverToBoxAdapter(
         child: Center(
           child: SizedBox(
-            height: 120,
-            width: 120,
+            height: 20,
+            width: 20,
             child: CircularProgressIndicator(),
           ),
         ),
@@ -107,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _categoryCard(int index) => ListViewCard(
         onTap: () {
           _bloc.add(CategoryListSelectEvent(index: index));
+          _bloc.add(FilterItemEvent());
         },
         cardWidth: 120,
         color: categoryList[index].isSelected
@@ -130,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: () {
           isSelected = index;
           _bloc.add(PriceListSelectEvent(index: index));
+          _bloc.add(FilterItemEvent());
         },
         cardWidth: 120,
         color: isSelected == index ? Colors.redAccent : Colors.purple[20],

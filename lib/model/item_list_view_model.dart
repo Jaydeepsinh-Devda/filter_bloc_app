@@ -14,3 +14,8 @@ class ItemListViewModel {
     this.isFavorite = false
   });
 }
+
+// class ItemsModel {
+//   List<CategoryModel> selectedCategories;
+//   List<ItemListViewModel> allItems;
+// }
