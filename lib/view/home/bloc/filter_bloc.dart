@@ -65,7 +65,7 @@ class FilterBloc extends Bloc<FilterEvent, FilterState> {
   }
 
   FutureOr<void> _onCategorySelect(
-      CategoryListSelectEvent event, Emitter<FilterState> emit) async {
+      CategoryListSelectEvent event, Emitter<FilterState> emit) {
     _categoryList[event.index].isSelected =
         !_categoryList[event.index].isSelected;
 
@@ -73,7 +73,7 @@ class FilterBloc extends Bloc<FilterEvent, FilterState> {
   }
 
   FutureOr<void> _onPriceSelect(
-      PriceListSelectEvent event, Emitter<FilterState> emit) async {
+      PriceListSelectEvent event, Emitter<FilterState> emit) {
     index = event.index;
 
     _itemList = _itemList
