@@ -2,60 +2,60 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:filter_bloc_demo/data/category_data.dart';
-import 'package:filter_bloc_demo/data/item_list_view_data.dart';
-import 'package:filter_bloc_demo/data/price_list_view_data.dart';
+import 'package:filter_bloc_demo/data/item_list_data.dart';
+import 'package:filter_bloc_demo/data/price_list_data.dart';
 import 'package:filter_bloc_demo/model/category_model.dart';
-import 'package:filter_bloc_demo/model/item_list_view_model.dart';
-import 'package:filter_bloc_demo/model/price_list_view_model.dart';
+import 'package:filter_bloc_demo/model/item_model.dart';
+import 'package:filter_bloc_demo/model/price_model.dart';
 import 'package:filter_bloc_demo/view/home/bloc/filter_event.dart';
 import 'package:filter_bloc_demo/view/home/bloc/filter_state.dart';
 
-class FilterBloc extends Bloc<FilterEvent, FilterState> {
-  List<ItemListViewModel> _itemList = [];
+class HomeBloc extends Bloc<FilterEvent, HomeState> {
+  List<ItemModel> _itemList = [];
   List<CategoryModel> _categoryList = [];
-  List<PriceListViewModel> _priceList = [];
-  int index = 0;
+  List<PriceModel> _priceList = [];
+  int _priceIndex = 0;
 
-  FilterBloc() : super(FilterInitialState()) {
+  HomeBloc() : super(HomeFilterListInitialState()) {
     on<GetListEvent>(_getList);
-    on<CategoryListSelectEvent>(_onCategorySelect);
-    on<PriceListSelectEvent>(_onPriceSelect);
-    on<ItemLikedEvent>(_likeButtonClicked);
-    on<FilterItemEvent>(_filterItem);
+    on<SelectCategoryEvent>(_onCategorySelect);
+    on<SelectPriceEvent>(_onPriceSelect);
+    on<ItemLikeUnlikeEvent>(_likeButtonClicked);
+    on<FilterItemListEvent>(_filterItem);
   }
 
   FutureOr<void> _filterItem(
-      FilterItemEvent event, Emitter<FilterState> emit) async {
-    var selectedCategoryList = _categoryList
-        .where((element) => element.isSelected)
-        .map((e) => e.category)
-        .toList();
-    var selectedPriceRange = _priceList[index];
-
-    _itemList = _getFilterItems(
-        selectedCategoryList, selectedPriceRange, itemListViewData);
-
-    emit(FilterLoadingState());
+      FilterItemListEvent event, Emitter<HomeState> emit) async {
+    emit(HomeFilterListLoadingState());
 
     await Future.delayed(
       const Duration(seconds: 3),
     );
 
-    emit(ItemListChangeState(list: _itemList));
+    var selectedCategoryList = _categoryList
+        .where((element) => element.isSelected)
+        .map((e) => e.category)
+        .toList();
+    var selectedPriceRange = _priceList[_priceIndex];
+
+    _itemList =
+        _getFilterItems(selectedCategoryList, selectedPriceRange, itemListData);
+
+    emit(OnItemListChangeState(list: _itemList));
   }
 
-  void _getList(GetListEvent event, Emitter<FilterState> emit) {
+  void _getList(GetListEvent event, Emitter<HomeState> emit) {
     _categoryList = categoryData;
-    _itemList = itemListViewData;
-    _priceList = priceListViewData;
-    emit(FilterGetListState(
+    _itemList = itemListData;
+    _priceList = priceListData;
+    emit(OnFilterGetListState(
         categoryList: _categoryList,
         priceList: _priceList,
         itemList: _itemList));
   }
 
-  List<ItemListViewModel> _getFilterItems(List<Category> selectedCategories,
-      PriceListViewModel range, List<ItemListViewModel> allItems) {
+  List<ItemModel> _getFilterItems(List<Category> selectedCategories,
+      PriceModel range, List<ItemModel> allItems) {
     return allItems.where((e) {
       return e.price >= range.min &&
           e.price <= range.max &&
@@ -65,16 +65,16 @@ class FilterBloc extends Bloc<FilterEvent, FilterState> {
   }
 
   FutureOr<void> _onCategorySelect(
-      CategoryListSelectEvent event, Emitter<FilterState> emit) {
+      SelectCategoryEvent event, Emitter<HomeState> emit) async {
     _categoryList[event.index].isSelected =
         !_categoryList[event.index].isSelected;
 
-    emit(CategoryListChangeState(list: _categoryList));
+    emit(OnCategoryListChangeState(list: _categoryList));
   }
 
   FutureOr<void> _onPriceSelect(
-      PriceListSelectEvent event, Emitter<FilterState> emit) {
-    index = event.index;
+      SelectPriceEvent event, Emitter<HomeState> emit) {
+    _priceIndex = event.index;
 
     _itemList = _itemList
         .where((e) =>
@@ -82,11 +82,13 @@ class FilterBloc extends Bloc<FilterEvent, FilterState> {
             e.price <= _priceList[event.index].max)
         .toList();
 
-    emit(PriceListChangeState(list: _priceList));
+    emit(OnPriceListChangeState(list: _priceList, index: _priceIndex));
   }
 
-  void _likeButtonClicked(ItemLikedEvent event, Emitter<FilterState> emit) {
+  FutureOr<void> _likeButtonClicked(
+      ItemLikeUnlikeEvent event, Emitter<HomeState> emit) {
     _itemList[event.index].isFavorite = !_itemList[event.index].isFavorite;
-    emit(ItemListChangeState(list: _itemList));
+    
+    emit(OnItemListChangeState(list: _itemList));
   }
 }

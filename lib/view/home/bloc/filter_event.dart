@@ -9,31 +9,31 @@ abstract class FilterEvent extends Equatable {
 
 class GetListEvent extends FilterEvent {}
 
-class CategoryListSelectEvent extends FilterEvent {
+class SelectCategoryEvent extends FilterEvent {
   final int index;
 
-  const CategoryListSelectEvent({required this.index});
+  const SelectCategoryEvent({required this.index});
 
   @override
   List<Object?> get props => [index];
 }
 
-class PriceListSelectEvent extends FilterEvent {
+class SelectPriceEvent extends FilterEvent {
   final int index;
 
-  const PriceListSelectEvent({required this.index});
+  const SelectPriceEvent({required this.index});
 
   @override
   List<Object?> get props => [index];
 }
 
-class ItemLikedEvent extends FilterEvent {
+class ItemLikeUnlikeEvent extends FilterEvent {
   final int index;
 
-  const ItemLikedEvent({required this.index});
+  const ItemLikeUnlikeEvent({required this.index});
 
   @override
   List<Object?> get props => [index];
 }
 
-class FilterItemEvent extends FilterEvent {}
+class FilterItemListEvent extends FilterEvent {}

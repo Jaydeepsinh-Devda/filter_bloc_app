@@ -6,8 +6,8 @@ enum Category {
 }
 
 class CategoryModel {
-  String name;
-  Category category;
+  final String name;
+  final Category category;
   bool isSelected;
 
   CategoryModel({

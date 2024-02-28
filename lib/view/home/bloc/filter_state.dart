@@ -1,25 +1,25 @@
 import 'package:equatable/equatable.dart';
 import 'package:filter_bloc_demo/model/category_model.dart';
-import 'package:filter_bloc_demo/model/item_list_view_model.dart';
-import 'package:filter_bloc_demo/model/price_list_view_model.dart';
+import 'package:filter_bloc_demo/model/item_model.dart';
+import 'package:filter_bloc_demo/model/price_model.dart';
 
-class FilterState extends Equatable {
-  const FilterState();
+class HomeState extends Equatable {
+  const HomeState();
 
   @override
   List<Object?> get props => [];
 }
 
-class FilterInitialState extends FilterState {}
+class HomeFilterListInitialState extends HomeState {}
 
-class FilterLoadingState extends FilterState {}
+class HomeFilterListLoadingState extends HomeState {}
 
-class FilterGetListState extends FilterState {
+class OnFilterGetListState extends HomeState {
   final List<CategoryModel> categoryList;
-  final List<PriceListViewModel> priceList;
-  final List<ItemListViewModel> itemList;
+  final List<PriceModel> priceList;
+  final List<ItemModel> itemList;
 
-  const FilterGetListState(
+  const OnFilterGetListState(
       {required this.categoryList,
       required this.priceList,
       required this.itemList});
@@ -29,28 +29,29 @@ class FilterGetListState extends FilterState {
       [categoryList, priceList, itemList, identityHashCode(this)];
 }
 
-class CategoryListChangeState extends FilterState {
+class OnCategoryListChangeState extends HomeState {
   final List<CategoryModel> list;
 
-  const CategoryListChangeState({required this.list});
+  const OnCategoryListChangeState({required this.list});
 
   @override
   List<Object?> get props => [list, identityHashCode(this)];
 }
 
-class PriceListChangeState extends FilterState {
-  final List<PriceListViewModel> list;
+class OnPriceListChangeState extends HomeState {
+  final List<PriceModel> list;
+  final int index;
 
-  const PriceListChangeState({required this.list});
+  const OnPriceListChangeState({required this.list, required this.index});
 
   @override
-  List<Object?> get props => [list, identityHashCode(this)];
+  List<Object?> get props => [list, index, identityHashCode(this)];
 }
 
-class ItemListChangeState extends FilterState {
-  final List<ItemListViewModel> list;
+class OnItemListChangeState extends HomeState {
+  final List<ItemModel> list;
 
-  const ItemListChangeState({required this.list});
+  const OnItemListChangeState({required this.list});
 
   @override
   List<Object?> get props => [list, identityHashCode(this)];

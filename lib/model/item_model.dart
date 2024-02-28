@@ -1,17 +1,16 @@
 import 'package:filter_bloc_demo/model/category_model.dart';
 
-class ItemListViewModel {
-  String name;
-  int price;
-  Category category;
+class ItemModel {
+  final String name;
+  final int price;
+  final Category category;
   bool isFavorite;
 
-
-  ItemListViewModel({
+  ItemModel({
     required this.name,
     required this.category,
     required this.price,
-    this.isFavorite = false
+    this.isFavorite = false,
   });
 }
 

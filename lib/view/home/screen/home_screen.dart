@@ -1,7 +1,7 @@
 import 'package:filter_bloc_demo/data/category_data.dart';
 import 'package:filter_bloc_demo/model/category_model.dart';
-import 'package:filter_bloc_demo/model/item_list_view_model.dart';
-import 'package:filter_bloc_demo/model/price_list_view_model.dart';
+import 'package:filter_bloc_demo/model/item_model.dart';
+import 'package:filter_bloc_demo/model/price_model.dart';
 import 'package:filter_bloc_demo/view/home/bloc/filter_bloc.dart';
 import 'package:filter_bloc_demo/view/home/bloc/filter_event.dart';
 import 'package:filter_bloc_demo/view/home/bloc/filter_state.dart';
@@ -17,17 +17,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<ItemListViewModel> itemList = [];
+  List<ItemModel> itemList = [];
   List<CategoryModel> categoryList = [];
-  List<PriceListViewModel> priceList = [];
-  int isSelected = 0;
+  List<PriceModel> priceList = [];
+  int priceListIndex = 0;
 
-  late FilterBloc _bloc;
+  late HomeBloc _bloc;
 
   //! Widget Lifecycle Method
   @override
   void initState() {
-    _bloc = context.read<FilterBloc>();
+    _bloc = context.read<HomeBloc>();
     _bloc.add(GetListEvent());
     super.initState();
   }
@@ -45,26 +45,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //! Widget Methods
 
-  Widget _blocBuilder() => BlocBuilder<FilterBloc, FilterState>(
+  Widget _blocBuilder() => BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-          if (state is FilterGetListState) {
+          if (state is OnFilterGetListState) {
             categoryList = state.categoryList;
             priceList = state.priceList;
             itemList = state.itemList;
           }
-          if (state is CategoryListChangeState) {
+          if (state is OnCategoryListChangeState) {
             categoryList = state.list;
+            _bloc.add(FilterItemListEvent());
           }
-          if (state is PriceListChangeState) {
+          if (state is OnPriceListChangeState) {
             priceList = state.list;
+            priceListIndex = state.index;
+            _bloc.add(FilterItemListEvent());
           }
-          if (state is ItemListChangeState) {
+          if (state is OnItemListChangeState) {
             itemList = state.list;
           }
           return CustomScrollView(
             slivers: [
               _filterOptionsCategoryAndPrice(),
-              state is FilterLoadingState
+              state is HomeFilterListLoadingState
                   ? _loadingIndicator()
                   : _itemListView()
             ],
@@ -76,12 +79,14 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             _categoryList(),
-            const SizedBox(height: 20),
+            _spacer(),
             _priceListView(),
-            const SizedBox(height: 20),
+            _spacer(),
           ],
         ),
       );
+
+  Widget _spacer() => const SizedBox(height: 20);
 
   Widget _loadingIndicator() => const SliverToBoxAdapter(
         child: Center(
@@ -106,8 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _categoryCard(int index) => ListViewCard(
         onTap: () {
-          _bloc.add(CategoryListSelectEvent(index: index));
-          _bloc.add(FilterItemEvent());
+          _bloc.add(SelectCategoryEvent(index: index));
         },
         cardWidth: 120,
         color: categoryList[index].isSelected
@@ -129,12 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _priceCard(int index) => ListViewCard(
         onTap: () {
-          isSelected = index;
-          _bloc.add(PriceListSelectEvent(index: index));
-          _bloc.add(FilterItemEvent());
+          _bloc.add(SelectPriceEvent(index: index));
         },
         cardWidth: 120,
-        color: isSelected == index ? Colors.redAccent : Colors.purple[20],
+        color: priceListIndex == index ? Colors.redAccent : Colors.purple[20],
         showListProperty: priceList[index].price,
       );
 
@@ -147,11 +149,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _itemListTile(int index) => Card(
         child: ListTile(
-          leading: _leadingLikeButton(index),
-          title: Text(itemList[index].name),
-          subtitle: Text(itemList[index].category.name.toUpperCase()),
-          trailing: _trailingItemPrice(index)
-        ),
+            leading: _leadingLikeButton(index),
+            title: Text(itemList[index].name),
+            subtitle: Text(itemList[index].category.name.toUpperCase()),
+            trailing: _trailingItemPrice(index)),
       );
 
   Widget _leadingLikeButton(int index) => IconButton(
@@ -159,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? const Icon(Icons.favorite)
             : const Icon(Icons.favorite_border),
         onPressed: () {
-          _bloc.add(ItemLikedEvent(index: index));
+          _bloc.add(ItemLikeUnlikeEvent(index: index));
         },
       );
 
