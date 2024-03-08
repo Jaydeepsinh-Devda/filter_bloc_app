@@ -70,6 +70,7 @@ class HomeBloc extends Bloc<FilterEvent, HomeState> {
         !_categoryList[event.index].isSelected;
 
     emit(OnCategoryListChangeState(list: _categoryList));
+    add(FilterItemListEvent());
   }
 
   FutureOr<void> _onPriceSelect(
@@ -88,7 +89,7 @@ class HomeBloc extends Bloc<FilterEvent, HomeState> {
   FutureOr<void> _likeButtonClicked(
       ItemLikeUnlikeEvent event, Emitter<HomeState> emit) {
     _itemList[event.index].isFavorite = !_itemList[event.index].isFavorite;
-    
+
     emit(OnItemListChangeState(list: _itemList));
   }
 }

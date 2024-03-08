@@ -45,24 +45,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //! Widget Methods
 
-  Widget _blocBuilder() => BlocBuilder<HomeBloc, HomeState>(
+  Widget _blocBuilder() => BlocConsumer<HomeBloc, HomeState>(
+        listener: (context, state) async {
+          if (state is OnPriceListChangeState ||
+              state is OnCategoryListChangeState) {
+            _bloc.add(FilterItemListEvent());
+          }
+        },
         builder: (context, state) {
           if (state is OnFilterGetListState) {
             categoryList = state.categoryList;
             priceList = state.priceList;
             itemList = state.itemList;
           }
-          if (state is OnCategoryListChangeState) {
-            categoryList = state.list;
-            _bloc.add(FilterItemListEvent());
-          }
-          if (state is OnPriceListChangeState) {
-            priceList = state.list;
-            priceListIndex = state.index;
-            _bloc.add(FilterItemListEvent());
-          }
           if (state is OnItemListChangeState) {
             itemList = state.list;
+          }
+          if (state is OnPriceListChangeState) {
+            priceListIndex = state.index;
+          }
+          if (state is OnCategoryListChangeState) {
+            categoryList = state.list;
           }
           return CustomScrollView(
             slivers: [
@@ -134,6 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _priceCard(int index) => ListViewCard(
         onTap: () {
           _bloc.add(SelectPriceEvent(index: index));
+          debugPrint("On Tap inside Card $priceListIndex");
         },
         cardWidth: 120,
         color: priceListIndex == index ? Colors.redAccent : Colors.purple[20],
